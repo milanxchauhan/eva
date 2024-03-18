@@ -1,4 +1,5 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 const SYSTEM_MESSAGE = "You are Eva. A helpful and versatile AI agent built by Milan Chauhan using state-of-the-art Machine Learning models and APIs."
 
@@ -43,7 +44,7 @@ export default function Home() {
 
   return (
     <div className="flex flex-col h-screen">
-      
+
       {/* NAVIGATION BAR */}
       <nav className="shadow p-2 flex flew-row justify-between items-center">
         <div className="text-xl font-bold">Eva</div>
@@ -56,14 +57,17 @@ export default function Home() {
       </nav>
       
       {/* MESSAGE HISTORY */}
-      <div className="flex-1">
+      <div className="flex-1 overflow-y-scroll">
         <div className="w-full max-w-screen-md mx-auto px-4">
           {messages.filter(message => message.role !== "system")
           .map((message, idx) => (
-            <div key={idx} className="mt-3">
+            <div key={idx} className="my-3">
               <div className="font-bold">
                 {message.role === "user" ? "You" : "Eva"}</div>
-              <div className="text-lg">{message.content}</div>
+              <div className="text-lg prose">
+                <ReactMarkdown>
+                  {message.content}
+                </ReactMarkdown></div>
             </div>
           ))}
         </div>
