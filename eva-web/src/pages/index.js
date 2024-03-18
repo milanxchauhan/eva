@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import Head from "next/head";
 
 const SYSTEM_MESSAGE = "You are Eva. A helpful and versatile AI agent built by Milan Chauhan using state-of-the-art Machine Learning models and APIs."
 
@@ -43,6 +44,10 @@ export default function Home() {
   const API_URL = "https://api.openai.com/v1/chat/completions";
 
   return (
+    <>
+    <Head>
+      <title>Eva - AI Agent</title>
+    </Head>
     <div className="flex flex-col h-screen">
 
       {/* NAVIGATION BAR */}
@@ -89,6 +94,7 @@ export default function Home() {
       </div>
 
     </div>
+    </>
   );
 }
   
