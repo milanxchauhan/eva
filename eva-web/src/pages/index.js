@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import Head from "next/head";
 
 const SYSTEM_MESSAGE = "You are Eva. An AI agent built by Milan Chauhan using state of the art large language models.";
 
@@ -41,7 +42,13 @@ export default function Home() {
     setMessages(newMessages2);
   }
 
-  return <div className="flex flex-col h-screen">
+  return (
+  <>
+  <Head>
+    <title>Eva - AI Agent</title>
+  </Head>
+  
+  <div className="flex flex-col h-screen">
 
     {/* Navigation Bar */}
     <nav className="shadow px-4 py-2 flex flex-row justify-between items-center">
@@ -84,4 +91,6 @@ export default function Home() {
       </div>
     </div>
   </div>
+  </> 
+  );
 }
