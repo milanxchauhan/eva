@@ -1,6 +1,7 @@
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import Head from "next/head";
+import { createParser } from "eventsource-parser";
 
 const SYSTEM_MESSAGE = "You are Eva. An AI agent built by Milan Chauhan using state of the art large language models.";
 
@@ -13,34 +14,73 @@ export default function Home() {
 
   const API_URL = "https://api.openai.com/v1/chat/completions";
 
-  async function sendRequest() {
-    // update message history
-    const newMessage = { role: "user", content: userMessage};
-    const newMessages = [...messages, newMessage];
+  const sendRequest = async () => {
+    const updatedMessages = [
+      ...messages,
+      {
+        role: "user",
+        content: userMessage,
+      },
+    ];
 
-    setMessages(newMessages);
+    setMessages(updatedMessages);
     setUserMessage("");
 
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: updatedMessages,
+          stream: true,
+        }),
+      });
 
-    const response = await fetch(API_URL,{
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + apiKey,
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: newMessages,
-      }),
-    });
+      const reader = response.body.getReader();
 
-    const responseJson = await response.json();
-    const newBotMessage = responseJson.choices[0].message;
-    const newMessages2 = [...newMessages, newBotMessage];
+      let newMessage = "";
+      const parser = createParser((event) => {
+        if (event.type === "event") {
+          const data = event.data;
+          if (data === "[DONE]") {
+            return;
+          }
+          const json = JSON.parse(event.data);
+          const content = json.choices[0].delta.content;
 
+          if (!content) {
+            return;
+          }
 
-    setMessages(newMessages2);
-  }
+          newMessage += content;
+
+          const updatedMessages2 = [
+            ...updatedMessages,
+            { role: "assistant", content: newMessage },
+          ];
+
+          setMessages(updatedMessages2);
+        } else {
+          return "";
+        }
+      });
+
+      // eslint-disable-next-line
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const text = new TextDecoder().decode(value);
+        parser.feed(text);
+      }
+    } catch (error) {
+      console.error("error");
+      window.alert("Error:" + error.message);
+    }
+  };
 
   return (
   <>
