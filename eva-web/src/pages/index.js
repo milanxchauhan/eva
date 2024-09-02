@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 const SYSTEM_MESSAGE = "You are Eva. An AI agent built by Milan Chauhan using state of the art large language models.";
 
@@ -56,15 +57,17 @@ export default function Home() {
     </nav>
 
     {/* Message History */}
-    <div className="flex-1">
+    <div className="flex-1 overflow-y-scroll">
       <div className="w-full max-w-screen-md mx-auto px-4">
         {messages.filter((message) => message.role !== "system")
         .map((message, idx) => (
-          <div key={idx} className="mt-3">
+          <div key={idx} className="my-3">
             <div className="font-bold">
               {message.role === "user" ? "You" : "Eva"}
             </div>
-            <div className="text-lg">{message.content}</div>
+            <div className="text-lg prose">
+              <ReactMarkdown>{message.content}</ReactMarkdown>
+            </div>
           </div>
         ))}
       </div>
